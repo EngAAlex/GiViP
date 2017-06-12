@@ -1,0 +1,90 @@
+#ex1 {
+	width: 30px;
+	margin-right: 7px;
+}
+
+/*#treeMapArea {
+	margin-top: -25px;
+}*/
+
+.needle {
+	cursor: move;
+	stroke: red;
+	stroke-width: 2px;
+}
+
+.center {
+	text-align: center;
+}
+
+.shortDiagram {
+	margin: 0 auto;
+	width: 95%;
+	height: 200px;
+}
+
+.diagram {
+	width: 100%;
+	height: 100%;
+	/*min-height: 400px;*/
+}
+
+.largeDiagram {
+	height: 100%;
+	/*min-height: 450px;*/
+}
+
+.smallMultipleRow {
+	height: auto;
+	max-height: 500px;
+	overflow: auto;
+	max-height: 500px;
+}
+
+.smallMultiple {
+	width: 100%;
+}
+
+.chart-tooltip {
+	border-radius: 5px;
+	background-color: rgba(255, 255, 255, 0.7);
+	padding: 5px;
+}
+
+.node--hover rect {
+	stroke: #000;
+}
+
+.highlighted {
+	/*fill: yellow !important;*/
+	stroke: red !important;
+	stroke-width: 3;
+}
+
+#treeMapArea tspan{
+  font-size: large;
+  font-weight: bold;
+}
+
+#treeMapArea tspan.workerTile{
+	font-size: xx-large;
+}
+
+#treemap-node-virtualRoot {
+    pointer-events: none;
+}
+
+/*
+.shadowed {
+	-webkit-box-shadow: inset 0px 0px 118px 19px rgba(255, 255, 255, 1);
+	-moz-box-shadow: inset 0px 0px 118px 19px rgba(255, 255, 255, 1);
+	box-shadow: inset 0px 0px 118px 19px rgba(255, 255, 255, 1);
+}
+*/
+.deactivatedTile rect{
+	fill: rgba(255, 255, 255, 0.71);
+}
+
+.deactivatedTile tspan{
+	fill: black !important;
+}
