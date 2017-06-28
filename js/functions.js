@@ -78,6 +78,8 @@ var hiddenElements = {};
 
 //SUPPORT VARIABLES
 
+var extents;
+
 var leftMargin;
 
 var needleTick;
@@ -152,8 +154,10 @@ function firstSetupCallback(data){
 //		computeTicks(index);
 	});
 
+	superstepBlocks = reduceCrossings(superstepBlocks);
+
 	currentStartPage = Math.floor(currentSuperstepIndex/(paginationExtent*currentBlockSize));
-	
+
 	var superstepToSet = Math.floor((currentSuperstepIndex/(paginationExtent*currentBlockSize))/currentBlockSize);
 
 	if(superstepToSet == 0)
@@ -176,12 +180,12 @@ function firstSetupCallback(data){
 	}else{
 		$('#nextPage').attr('disabled', false);
 	}
-	
+
 	if(currentSuperstepIndex != 0)
 		$('#prevPage').attr('disabled', false);
 	else
 		$('#prevPage').attr('disabled', 'disabled');
-	
+
 	$('#framesDisplay').html(currentSuperstepIndex + " to " + nextIndex);		
 }
 
@@ -339,7 +343,7 @@ function setCurrentSuperstep(c, needle = false){
 		$('#step-backward-button').attr("disabled", 'disabled');
 	else
 		$('#step-backward-button').attr("disabled", false);
-	
+
 	if(!needle){
 		clearAll();
 		prepareAndDisplayAll();
@@ -470,7 +474,7 @@ function prepareAndDisplayAll(animateOrReset = false){
 	});
 
 	renderSmallMultiples();
-	
+
 	if(!animateOrReset)
 		renderChordDiagram();
 	else
@@ -711,12 +715,12 @@ function checkElementRemoval(nodes, idOnly = false){
 			$('#stackedAreaBytes-' + excapedElementIndex).slideUp();
 			$('#stackedAreaMessages-' + excapedElementIndex).slideUp();
 		}
-		
+
 	});
-	
+
 	if(!animationLock)
 		chordDiagram.animate();
-	
+
 //	clearChordDiagram();
 //	renderChordDiagram();
 //	prepareAndDisplayAll();
@@ -757,16 +761,16 @@ function bindSlider(nsupersteps){
 		ticks_labels: ["Worker", "Host", "Rack"]
 	}).on("slideStop", function(event){
 		$("#loading-modal").modal({
-		    backdrop: 'static',
-		    keyboard: false
+			backdrop: 'static',
+			keyboard: false
 		});		
 		clearAll();
 		setCurrentScale(event.value);
 		$("#loading-modal").modal('hide');
 	});
-	
+
 	$('#ex1Slider .slider-tick-label-container').remove();
-	
+
 	$('#ex1Slider').append(
 			`<div class='slider-tick-label-container'>				
 			<div class='slider-tick-label' style='width: 100%; text-align: center'>
@@ -839,13 +843,243 @@ function higlightElements(elementIndex = ""){
 	}
 }
 
+//CROSSING REDUCTION
+
+function reduceCrossings(data){
+//	initialOrdering = {};
+//	inverseInitialOrdering = {};			
+	extents = {};
+	var indices = {};
+
+	var supersteps = jobInfo.nsupersteps;
+
+	for(i = 2; i >= 0; i--){
+//		initialOrdering[scales[i]] = {};
+		var currentBatch = data[scales[i]][0].blockElementDetails;
+		var currentEdges = data[scales[i]][0].edges;
+		var unassignedVertices = currentBatch.length;
+		var tempData = {};
+//		var tempArray = [];
+		var batchSize = currentBatch.length;
+
+//		for(var p=0; p<unassignedVertices; p++)
+//		tempArray[p] = -1;
+
+		//INIT
+
+		for(var t in currentBatch){
+			var current = currentBatch[t];
+			indices[current.elementIndex] = t;
+			tempData[current.elementIndex] = {elementIndex: current.elementIndex, placed: -1, neighbors: {}, uNeighbors: {}, noOfUNeighbors: 0, openEdges: 0};
+		}
+		for(var t in currentEdges){
+			var current = currentEdges[t];	
+			tempData[current.source].uNeighbors[current.target] = true;
+			tempData[current.target].uNeighbors[current.source] = true;
+			tempData[current.source].neighbors[current.target] = current.size/supersteps;
+			tempData[current.target].neighbors[current.source] = current.size/supersteps;
+			tempData[current.source].noOfUNeighbors += 1; 					
+			tempData[current.target].noOfUNeighbors += 1; 										
+//			tempData[current.source].openEdges += current.size/supersteps; 
+//			tempData[current.target].openEdges += current.size/supersteps; 					
+		}
+
+		var lastIndex = -1;
+
+		//MAIN LOOP
+		do{
+			var chosen;
+			var minNeighbors = Number.MAX_VALUE;
+			//CHOOSE ELEMENT BY NO OF UNPLACED NEIGHBORS
+			$.each(tempData, function(index, item){
+				if(item.placed == -1 && item.noOfUNeighbors < minNeighbors){
+					minNeighbors = item.noOfUNeighbors;
+					chosen = item;
+				}
+			});
+
+//			batchSize++;
+
+			var left = false;
+
+			//CHOOSE ITS FINAL POSITION
+			if(lastIndex == -1 && scales[i] == "rack"){
+				lastIndex = 0;				
+			}else{
+				var indexLeft; 
+				var indexRight;
+				if(scales[i] == "rack"){
+					indexLeft = lastIndex-1%batchSize;
+					indexRight = lastIndex+1%batchSize;
+				}else{
+					var parent = simplifiedHierarchy[scales[i]][chosen.elementIndex].parent;
+					var start = extents[scales[i+1]][parent].start;					
+					var extent = extents[scales[i+1]][parent].extent;
+					var lowerBound = extents[scales[i+1]][parent].lowerBound;
+					var upperBound = extents[scales[i+1]][parent].upperBound;
+					var sectorLastIndex = extents[scales[i+1]][parent].lastIndex;
+					
+					if(sectorLastIndex == -1){
+						indexLeft = start;
+						indexRight = start;
+					}else{					
+						indexLeft = circularReference(lowerBound-1, start, extent);
+						indexRight = circularReference(upperBound +1, start, extent);
+					}
+				}
+//				var modulo;
+//				var startingIndex = 0;
+				var valueLeft = 0;
+				var valueRight = 0;
+
+				tempData[chosen.elementIndex].placed = indexLeft;
+				valueLeft = computeCrossingsForLayout(tempData, currentEdges, i);
+
+				if(indexLeft == indexRight)
+					valueRight = valueLeft;
+				else{
+					tempData[chosen.elementIndex].placed = indexRight;
+					valueRight = computeCrossingsForLayout(tempData, currentEdges, i);
+				}
+
+				if(valueLeft < valueRight){
+					lastIndex = indexLeft;
+					left = true;
+				}else{							
+					lastIndex = indexRight;
+				}
+
+			}
+
+//			tempArray[lastIndex] = chosen.elementIndex;
+			tempData[chosen.elementIndex].placed = lastIndex;
+
+//			inverseInitialOrdering[chosen.elementIndex] = lastIndex;
+
+			if(scales[i] != "rack"){
+				extents[scales[i+1]][simplifiedHierarchy[scales[i]][chosen.elementIndex].parent].lastIndex = lastIndex;				
+				if(left)
+					extents[scales[i+1]][simplifiedHierarchy[scales[i]][chosen.elementIndex].parent].lowerBound = lastIndex;
+				else
+					extents[scales[i+1]][simplifiedHierarchy[scales[i]][chosen.elementIndex].parent].upperBound = lastIndex;						
+			}
+
+			//UPDATE
+			$.each(tempData, function(index, item){
+				if(item.uNeighbors[chosen.elementIndex]){
+					item.uNeighbors[chosen.elementIndex] = null;
+					item.noOfUNeighbors--;							
+					if(item.placed){
+						var edgeValue = item.neighbors[chosen.elementIndex];
+//						item.openEdges -= edgeValue;
+//						chosen.openEdges -= edgeValue;
+					}
+				}
+			});
+			unassignedVertices--;
+		}while(unassignedVertices > 0);
+
+//		initialOrdering[scales[i]] = tempArray;
+
+		for(var o=0; o<scales[i].length; o++){
+			var temp = [];				
+			$.each(tempData, function(index, item){
+				temp[item.placed] = data[scales[i]][o].blockElementDetails[indices[index]];
+			});
+			data[scales[i]][o].blockElementDetails = temp;						
+		}
+		if(scales[i] != "worker"){
+			var current = {};
+			var rotation = 0;
+			$.each(tempData, function(index, item){
+				var currentExtent = simplifiedHierarchy[scales[i]][item.elementIndex].children.length;
+				current[item.elementIndex] = {};
+				current[item.elementIndex].start = /*item.placed +*/ rotation;
+				current[item.elementIndex].extent = currentExtent;
+				current[item.elementIndex].lowerBound = rotation;//item.placed;		
+				current[item.elementIndex].upperBound = rotation; //item.placed;
+				current[item.elementIndex].lastIndex = -1;
+				
+				rotation += currentExtent;
+			});
+			extents[scales[i]] = current;
+		}else{
+			return data;
+		}
+
+	}
+
+}
+
+function computeCrossingsForLayout(tempData, edges, scale){
+	var crossings = 0;
+	var currentExtents = extents[scales[i+1]];
+	edges.forEach(function(firstEdge, firstEdgeIndex){
+		if(firstEdge.messagesExchanged == 0)
+			return;
+		edges.forEach(function(secondEdge, secondEdgeIndex){
+			if(firstEdge === secondEdge || secondEdge.messagesExchanged == 0)
+				return;
+			if(scales[scale] == "rack") 
+				if((tempData[firstEdge.source].placed == -1	||
+						tempData[firstEdge.target].placed == -1)	|| 
+						(tempData[secondEdge.source].placed == -1	||
+								tempData[secondEdge.target].placed == -1))						
+					return false;
+
+//			var parent = simplifiedHierarchy[scales[i]][chosen.elementIndex].parent;								
+
+			var firstEdgeSource, secondEdgeSource;
+			var firstEdgeTarget, secondEdgeTarget;
+
+			if(tempData[firstEdge.source].placed != -1)
+				firstEdgeSource = tempData[firstEdge.source].placed;
+			else
+				firstEdgeSource = currentExtents[getParent(firstEdge.source)].start;
+
+			if(tempData[firstEdge.target].placed != -1)
+				firstEdgeTarget = tempData[firstEdge.target].placed;
+			else
+				firstEdgeTarget = currentExtents[getParent(firstEdge.target)].start + currentExtents[getParent(firstEdge.target)].extent;
+
+			if(tempData[secondEdge.source].placed != -1)
+				secondEdgeSource = tempData[secondEdge.source].placed;
+			else
+				secondEdgeSource = currentExtents[getParent(secondEdge.source)].start;
+
+			if(tempData[secondEdge.target].placed != -1)
+				secondEdgeTarget = tempData[secondEdge.target].placed;
+			else
+				secondEdgeTarget = currentExtents[getParent(secondEdge.target)].start + currentExtents[getParent(secondEdge.target)].extent;
+
+			if(!(firstEdgeSource <= secondEdgeSource)
+					||
+					!(firstEdgeTarget >= secondEdgeTarget))
+				crossings += firstEdge.messagesExchanged + secondEdge.messagesExchanged;
+		});		
+	});
+	return crossings/2;
+}
+
+function circularReference(value, start, extent){
+	var correctedValue = value - start;
+	var temp = correctedValue%extent;
+	if(temp<0)
+		temp += extent;
+	return temp + start;
+}
+
+function getParent(element){
+	return simplifiedHierarchy[scales[i]][element].parent;
+}
+
 //OTHERS
 
 function wrapLabels(text) {
 	var index = 0;
 	var deactivatedIndices = 0;
-    var a = document.createElement('canvas');
-    var b = a.getContext('2d');	
+	var a = document.createElement('canvas');
+	var b = a.getContext('2d');	
 	text.each(function(){
 		var current = d3.select(this);
 		var labelLength = current.node().getComputedTextLength();					
