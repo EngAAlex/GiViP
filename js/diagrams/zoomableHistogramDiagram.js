@@ -10,10 +10,10 @@ var AreaChart = (function(){
 		return "<strong>Frame:</strong> <span style='color:red'>" + d.numberOfBlock + "</span><br /><strong>Duration:</strong> <span style='color:red'>" + d.duration + "</span>";
 	});
 
-	function zoom() {
-		d3.transform(x);
-		draw();	
-	}
+//	function zoom() {
+//		d3.transform(x);
+//		draw();	
+//	}
 
 	return {
 
@@ -21,10 +21,12 @@ var AreaChart = (function(){
 
 			var tag = "#" + frame;
 
-			hWidth = d3.select(tag).node().getBoundingClientRect().width - 10;
-			hHeight = d3.select(tag).node().getBoundingClientRect().height;
+			//hWidth = d3.select(tag).node().getBoundingClientRect().width - 10;
+			hWidth = x.range()[1] + 5;// - x.range()[0];
+			hHeight = smallMultipleHeight;
+			//hHeight = d3.select(tag).node().getBoundingClientRect().height;
 
-			d3.select(tag).enter().select('svg')
+			d3.select(tag).select('svg')
 			.attr("width", hWidth).attr("height", hHeight);
 
 		},
@@ -33,10 +35,14 @@ var AreaChart = (function(){
 
 			frame = selectedFrame;
 
+			/*
 			hWidth = d3.select("#" + frame).node().getBoundingClientRect().width - 10;
 			hHeight = d3.select("#" + frame).node().getBoundingClientRect().height;
-
-			d3.select("#" + frame).append("svg").attr("width", hWidth).attr("height", hHeight);
+			*/
+			
+			d3.select("#" + frame).append("svg");//.attr("width", hWidth).attr("height", hHeight);
+			
+			this.resize();
 
 //			addXAxis();
 		},
@@ -118,7 +124,7 @@ var AreaChart = (function(){
 
 			svg.append("g")
 			.attr("class", "y axis")
-			.attr("transform", "translate(" + (10 + diagramPaddingX) + ",0)");
+			.attr("transform", "translate(" + (diagramPaddingX) + ",0)");
 
 			svg.append("path")
 			.datum(superstepBlocks[scales[currentScale]])
@@ -133,8 +139,8 @@ var AreaChart = (function(){
 			.attr("class", "pane")
 			.attr("width", hWidth)
 			.attr("height", hHeight)
-			.style("fill", "none")
-			.call(d3.zoom().on("zoom", zoom));
+			.style("fill", "none");
+			//.call(d3.zoom().on("zoom", zoom));
 			
 			// Vertical grid
 			svg.append("g")       

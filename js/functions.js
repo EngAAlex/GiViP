@@ -11,6 +11,7 @@ var transitionDuration = 750;
 
 var smallMultiplePadding = 10;
 var smallMultipleHeight = 50;
+var smallMultipleWidth;
 
 var bisector = d3.bisector(function (d) { return d; }).left;
 
@@ -62,7 +63,7 @@ var currentScale = 0;
 //DIAGRAMS
 
 var diagramPaddingY = 10;
-var diagramPaddingX = 35;
+var diagramPaddingX = 45;
 
 var treemapDiagram = TreeMap();
 var chordDiagram = ChordDiagram();
@@ -242,8 +243,6 @@ function prevPage(){
 }
 
 function resizeDiagrams(){
-	x.range([10 + diagramPaddingX, 
-		d3.select("#runningTimesAreaChartSVG").node().getBoundingClientRect().width - diagramPaddingX]);
 	clearAll();
 	updateAxis();
 	treemapDiagram.resize();
@@ -279,12 +278,21 @@ function getYAxis(y, max, zIndex, format){
 }
 
 function updateAxis(){
-	x = d3.scaleLinear();
-	x.range([10 + diagramPaddingX, 
-		d3.select("#runningTimesAreaChartSVG").node().getBoundingClientRect().width - diagramPaddingX]);
-	clipPathInfo[0] = x(0);
-	clipPathInfo[1] = x(1);
-	xAxis = d3.axisTop().scale(x).tickPadding(6).tickFormat(d3.format("d")); //.tickSize(-hiWidth, 0)
+	if(x == undefined)
+		x = d3.scaleLinear();
+	var panelWidth = d3.select(".smallMultipleRow").node().getBoundingClientRect().width;
+	var internalPadding = Number.parseInt($(".panel-body").css("padding").split("px")[0]);
+	smallMultipleWidth = panelWidth - internalPadding - 2*diagramPaddingX;
+	x.range([diagramPaddingX, 
+		smallMultipleWidth]);
+	
+	clipPathInfo[0] = diagramPaddingX;
+	clipPathInfo[1] = smallMultipleWidth;
+		
+//	clipPathInfo[0] = x(0);
+//	clipPathInfo[1] = x(1);
+	if(xAxis == undefined)
+		xAxis = d3.axisTop().scale(x).tickPadding(6).tickFormat(d3.format("d")); //.tickSize(-hiWidth, 0)
 
 	var currentTicks = tickValues[scales[currentScale]];
 	x.domain([currentTicks[0], currentTicks[currentTicks.length - 1]]);
@@ -295,9 +303,9 @@ function appendXAxisToFrame(frame){
 
 	var tag = "#" + frame;
 
-	var hWidth = d3.select(tag).node().getBoundingClientRect().width;
-
-	var svg = d3.select(tag).append("svg").attr("width", hWidth).attr("height", xAxisHeight);
+//	var hWidth = d3.select(tag).node().getBoundingClientRect().width;
+	
+	var svg = d3.select(tag).append("svg").attr("width", smallMultipleWidth + 20).attr("height", xAxisHeight);
 
 	svg.append("g")
 	.attr("class", "x axis active")

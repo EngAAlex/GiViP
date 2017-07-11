@@ -15,19 +15,38 @@ var StackedArea = (function(){
 	}
 
 	return {
+	
+		resize: function(){
+
+			var tag = "#" + frame;
+
+			//hWidth = d3.select(tag).node().getBoundingClientRect().width - 10;
+			hWidth = x.range()[1] + 5;
+			hHeight = smallMultipleHeight;
+			//hHeight = d3.select(tag).node().getBoundingClientRect().height;
+
+			d3.select(tag).select('svg')
+			.attr("width", hWidth).attr("height", hHeight);
+
+		},	
+	
 
 		stackedAreaSetup: function(selectedFrame){
 
 			frame = selectedFrame;
 
 			tag = "#" + frame; 
-
-			hWidth = d3.select(tag).node().getBoundingClientRect().width - 10;
-			hHeight = d3.select(tag).node().getBoundingClientRect().height;
-
-			$(tag).html("");
-
-			d3.select(tag).append("svg").attr("width", hWidth).attr("height", hHeight);;
+//
+//			hWidth = d3.select(tag).node().getBoundingClientRect().width - 10;
+//			hHeight = d3.select(tag).node().getBoundingClientRect().height;
+//
+//			$(tag).html("");
+//
+//			d3.select(tag).append("svg").attr("width", hWidth).attr("height", hHeight);
+			
+			d3.select(tag).append("svg");
+			
+			this.resize();
 
 		},
 
@@ -46,8 +65,8 @@ var StackedArea = (function(){
 
 			var i = -1;
 
-			var hWidth = d3.select(tag + " svg").node().getBoundingClientRect().width - 10;
-			var hHeight = d3.select(tag + " svg").node().getBoundingClientRect().height;
+//			var hWidth = d3.select(tag + " svg").node().getBoundingClientRect().width - 10;
+//			var hHeight = d3.select(tag + " svg").node().getBoundingClientRect().height;
 
 			y = d3.scaleLinear().range([diagramPaddingY, hHeight - diagramPaddingY]);
 
@@ -94,7 +113,7 @@ var StackedArea = (function(){
 
 			svg.append("g")
 			.attr("class", "y axis")
-			.attr("transform", "translate(" + (10 + diagramPaddingX) + ",0)");					
+			.attr("transform", "translate(" + (diagramPaddingX) + ",0)");					
 
 //			svg.select("g.x.axis").call(xAxis);
 			svg.select("g.y.axis").call(yAxis);		
