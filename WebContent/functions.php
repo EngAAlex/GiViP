@@ -7,7 +7,6 @@
 	function getJobsList(){
 		
 		global $webapp, $jobs;
-		
 		return json_decode(callRestApi($webapp.$jobs, "GET"), true);
 	
 	}

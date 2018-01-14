@@ -74,8 +74,13 @@ button[disabled], html input[disabled]{
 	line-height: 0.8em;
 }
 
+#chordScope.slider.slider-horizontal, #latencyScope.slider.slider-horizontal{
+	    width: 25px;	
+}
+
+
+
 #chordScope {
-    width: 25px;
     margin-left: 10px;
     margin-right: 10px;
 }
