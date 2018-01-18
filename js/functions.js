@@ -1,4 +1,4 @@
-var webServerUrl = "http://localhost:8080/9Meg0/GiraphJobServer/1.0.0/";
+var webServerUrl = "http://localhost:8080/9Meg0/GiraphJobServer/1.0.0/"; //ADJUST TO CONFORM TO PROPER SERVER CONFIGURATION 
 var jobInfoEndpoint = "JobInfo";
 var superstepBlockEndpoint = "SuperstepBlock/";
 
@@ -188,7 +188,7 @@ function firstSetupCallback(data){
 	else
 		$('#prevPage').attr('disabled', 'disabled');
 
-	$('#framesDisplay').html(currentSuperstepIndex + " to " + nextIndex);		
+	$('#framesDisplay').html(Math.floor(currentSuperstepIndex/currentBlockSize) + " to " + Math.ceil(nextIndex/currentBlockSize));		
 }
 
 function paginateSuperstepBlocks(){
@@ -797,10 +797,14 @@ function bindSlider(nsupersteps){
 		var target = event.currentTarget.value;
 		if(target == 0){
 			$('#heatMapArea').hide();
-			$('#treeMapArea').show();			
+			$('#hmViewTitle').hide()
+			$('#treeMapArea').show();	
+			$('#clViewTitle').show()			
 		}else{
 			$('#heatMapArea').show();
 			$('#treeMapArea').hide();	
+			$('#clViewTitle').hide()			
+			$('#hmViewTitle').show()			
 		}
 	});
 

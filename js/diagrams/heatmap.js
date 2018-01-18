@@ -103,13 +103,13 @@ var Heatmap = (function(){
 				data = dataS;*/
 
 			if(data.length == 0 || data == undefined){
-				this.displayNoData();
+				//this.displayNoData();
 			}else{
 
 				var svg = d3.select(container + " svg");
 
 				var scale = d3.scaleLinear()
-				.domain([0, /*d3.max(data, function (d) { return d.latency; })*/250])
+				.domain([0, /*d3.max(data, function (d) { return d.latency; })*/50])
 				.range([0, 1]);
 
 				/*var cards = svg.selectAll(".tile")
@@ -124,8 +124,8 @@ var Heatmap = (function(){
 				cards.append("rect")
 				.attr("x", function(d) { return (indexInBlockMap[d.target] * gridSizeX) - diagramPadding + 2*internalPadding; })
 				.attr("y", function(d) { return (indexInBlockMap[d.source] * gridSizeY) - diagramPadding + internalPadding; })
-				.attr("rx", 4)
-				.attr("ry", 4)
+				.attr("rx", 0)
+				.attr("ry", 0)
 				.attr("id", function(d){return "heatmap-tile-"+d.target+"%&%"+d.source;})
 				.attr("class", "heatmaptile bordered")
 				.attr("width", gridSizeX)

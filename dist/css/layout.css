@@ -78,6 +78,9 @@ button[disabled], html input[disabled]{
 	    width: 25px;	
 }
 
+#latencyScope.slider.slider-horizontal{
+	margin: 0px 10px 0px 10px;
+}
 
 
 #chordScope {

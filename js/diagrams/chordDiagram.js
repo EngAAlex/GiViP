@@ -3,7 +3,7 @@ var ChordDiagram = (function(){
 	var hWidth;
 	var hHeight;
 
-//	var updatedGroups;
+	var iUpdatedGroups;
 	var completeGroups = [];
 	var newCompleteGroups = [];
 
@@ -49,13 +49,14 @@ var ChordDiagram = (function(){
 	var arc;
 	var ribbon;
 
-	function baseLevelInfo(d){
+	function baseLevelInfo(d, updatedGroups){
 		var desc = "";
 		if(d.index%2 == 0)
 			desc = "Incoming messages";
 		else
 			desc = "Outgoing messages";
-		return "<strong>" + d.desc + ":</strong> <span style='color:red'>" + reverseLocalIndices[correctIndex(d.index)] + "</span><br /><strong>"+desc+":</strong> <span style='color:red'>" + d.value + "</span>"  + "</span><br /><strong>Self Traffic:</strong><span style='color:red'>" + d[selfMessagesScales["messages"]] + "</span>";		
+		return "<strong>" + d.desc + ":</strong> <span style='color:red'>" + reverseLocalIndices[correctIndex(d.index)] + "</span><br /><strong>"+desc+":</strong> <span style='color:red'>" + updatedGroups[d.index].value + "</span>"  + "</span><br /><strong>Self Traffic:</strong><span style='color:red'>" + updatedGroups[d.index][selfMessagesScales["messages"]] + "</span>";		
+//		return "<strong>" + d.desc + ":</strong> <span style='color:red'>" + reverseLocalIndices[correctIndex(d.index)] + "</span><br /><strong>"+desc+":</strong> <span style='color:red'>" + d.value + "</span>"  + "</span><br /><strong>Self Traffic:</strong><span style='color:red'>" + d[selfMessagesScales["messages"]] + "</span>";		
 	}
 
 	function ribbonInfo(d){
@@ -189,6 +190,7 @@ var ChordDiagram = (function(){
 
 		}
 		chords.groups = updatedGroups;
+		iUpdatedGroups = updatedGroups;
 //		completeGroups[0] = updatedGroups;
 		return updatedGroups;
 	}
@@ -743,11 +745,12 @@ var ChordDiagram = (function(){
 			.data(updatedGroups, arcKey);
 
 			var newGroups = 
-				groups.enter().append("path")
+				groups.append("path")
 				.attr("class", "arc")
 				.attr("id", function(d){ return dotExcaper("chord%"+d.elementIndex);})
 				.style("stroke", function(d) { return d3.color(colorOfElement(scales[currentScale], d.elementIndex)).darker(); })
-				.attr("opacity", "0")
+				.attr("opacity", "0");
+				/*.on('mouseover', null)
 				.on('mouseover',
 						function (d) {
 					$('#pointerPanelDefault').hide();
@@ -760,7 +763,7 @@ var ChordDiagram = (function(){
 				.on('mouseleave', function(d){
 					hidePointerInfo();
 					higlightElements();
-				});//baseLevelTip.hide)								
+				});//baseLevelTip.hide)*/								
 
 			//update chords
 			var chords = svg.select(".ribbons")
@@ -817,8 +820,8 @@ var ChordDiagram = (function(){
 
 				var currentAddedArcs = 
 					out.enter()
-					.append("g")
-					.on('mousemove',/*tip.show*/
+					.append("g");
+					/*.on('mousemove',/*tip.show
 							function (d) {
 						$('#pointerPanelDefault').hide();
 						$('#pointerPanel').html(
@@ -827,7 +830,7 @@ var ChordDiagram = (function(){
 						$('#pointerPanel').show();
 						higlightElements(dotExcaper(d.elementIndex));					
 					})
-					.on('mouseleave', function(d){hidePointerInfo(); higlightElements();}); 
+					.on('mouseleave', function(d){hidePointerInfo(); higlightElements();}); */
 
 				currentAddedArcs
 				.append("path")
@@ -1052,7 +1055,7 @@ var ChordDiagram = (function(){
 					function (d) {
 				$('#pointerPanelDefault').hide();
 				$('#pointerPanel').html(
-						baseLevelInfo(d)
+						baseLevelInfo(d, iUpdatedGroups)
 				);
 				$('#pointerPanel').show();
 				higlightElements(dotExcaper(d.elementIndex));
@@ -1176,7 +1179,7 @@ var ChordDiagram = (function(){
 						function (d) {
 					$('#pointerPanelDefault').hide();
 					$('#pointerPanel').html(
-							outerRingInfo(d)	
+							outerRingInfo(superstepBlocks[scales[scale]][currentSuperstep].blockElementDetails[elementToIndex(scales[scale],d.elementIndex)])	
 					);
 					$('#pointerPanel').show();
 					higlightElements(dotExcaper(d.elementIndex));					

@@ -277,7 +277,7 @@
 					<div class="col-md-6 no-left-padding no-right-padding fullHeight">
 						<div class="panel panel-default fullHeight">
 							<div class="panel-heading panel-subheading">
-								<i class="fa fa-sitemap fa-fw"></i> Cluster View
+								<i class="fa fa-sitemap fa-fw"></i><span id="clViewTitle"> Cluster View</span><span id="hmViewTitle"> Latency View</span>
 								<div class="pull-right">
 									<span class="smaller">Cluster</span> <input
 										id="latencySwitch" class="slider"
@@ -417,6 +417,7 @@
 
 		$(document).ready(function(){
 			$('#heatMapArea').hide();
+			$('#hmViewTitle').hide();			
 		})
 		
 		$('.slide-button').click(function(event){
