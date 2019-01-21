@@ -1,4 +1,4 @@
-var webServerUrl = "http://localhost:8080/9Meg0/GiraphJobServer/1.0.0/";
+var webServerUrl = "http://localhost:8080/GivipServer/1.0.0/";
 var jobInfoEndpoint = "JobInfo";
 var superstepBlockEndpoint = "SuperstepBlock/";
 

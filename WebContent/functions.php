@@ -1,6 +1,6 @@
 <?php
 
-	$webapp = "http://localhost:8080/9Meg0/GiraphJobServer/1.0.0/";
+	$webapp = "http://localhost:8080/GivipServer/1.0.0/";
 	$jobs = "Jobs";
 	$sstep_block = "SuperstepBlock";
 
@@ -13,7 +13,7 @@
 	}
 	
 	function callRestApi($url, $method, $data = false){
-		
+				
 		$curl = curl_init();
 		
 		switch($method){
