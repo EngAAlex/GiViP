@@ -691,10 +691,10 @@ function checkElementRemoval(nodes, idOnly = false){
 		if(idOnly){
 			elementIndex = item;
 		}else{
-			elementIndex = item.id;
+			elementIndex = item.id; 
 		}
 		excapedElementIndex = dotExcaper(elementIndex);		
-		if(index == 0)
+		//if(index == 0)
 			if(hiddenElements[item.id])
 				activate = true;
 		if(activate){			
@@ -703,21 +703,20 @@ function checkElementRemoval(nodes, idOnly = false){
 			$('#runningTimesHistogram-' + excapedElementIndex).slideDown();
 			$('#stackedAreaBytes-' + excapedElementIndex).slideDown();
 			$('#stackedAreaMessages-' + excapedElementIndex).slideDown();
-			if(!idOnly && index == 0 && hiddenElements[item.parent.id]){				
+			if(hiddenElements[item.parent.id]){	//!idOnly && index == 0 && 			
 				var parent = item.parent.id;
 				while(hiddenElements[parent]){
 					var excapedParent = dotExcaper(parent);					
-					$('#treemap-node-'+excapedParent).removeClass('deactivatedTile');
+					$($('g').has('#treemap-node-'+excapedParent)[0]).removeClass('deactivatedTile');
 					hiddenElements[parent] = null;
-					$('#runningTimesHistogram-' + excapedParent).slideDown();
+					/*$('#runningTimesHistogram-' + excapedParent).slideDown();
 					$('#stackedAreaBytes-' + excapedParent).slideDown();
-					$('#stackedAreaMessages-' + excapedParent).slideDown();						
+					$('#stackedAreaMessages-' + excapedParent).slideDown();*/						
 					parent = item.parent.parent.id;									
 				}
-
 			}
 		}else{
-			hiddenElements[elementIndex] = true;
+			hiddenElements[elementIndex] = true; //d.desc.toLowerCase();
 			$($('g').has('#treemap-node-'+excapedElementIndex)[0]).addClass('deactivatedTile');
 			$('#runningTimesHistogram-' + excapedElementIndex).slideUp();
 			$('#stackedAreaBytes-' + excapedElementIndex).slideUp();
@@ -807,7 +806,9 @@ function createFilterSlider(){
 		max: maxValue,
 		value: maxValue
 	}).on("slideStop", function(event){
+		animationLock = true;
 		restoreHiddenElements();
+		animationLock = false;
 		chordDiagram.showTopTraffic(event.currentTarget.value)
 	});;
 

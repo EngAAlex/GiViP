@@ -446,6 +446,8 @@ var ChordDiagram = (function(){
 	function arcTween(oldGroups, tOldSelfWeights, tOldMaxSelfWeight, newSelfWeights, newMaxSelfWeight) {
 
 		var oldChords = {};
+		var oldStartAngles = [];
+		var oldEndAngles = [];
 
 		if (oldGroups) {
 			oldGroups.forEach( function(chordData) {
@@ -453,17 +455,25 @@ var ChordDiagram = (function(){
 			});
 		}
 
+		oldGroups.forEach(function(item, index){
+			if(index%2 == 0){
+				oldStartAngles[item.elementIndex] = [];
+				oldEndAngles[item.elementIndex] = [];
+			}
+
+			oldStartAngles[item.elementIndex][index%2] = item.startAngle;
+			oldEndAngles[item.elementIndex][index%2] = item.endAngle;			
+		});
+
 		return function(d,i) {
 
-			var oldStartAngle;
-			var oldEndAngle;
 			var oldGirth;
 
 			var newGirth = computeArcGirth(newSelfWeights[d.elementIndex], newMaxSelfWeight);
 
-			if(oldChords[ arcKey(d) ]){
-				oldStartAngle = oldGroups[i].startAngle;
-				oldEndAngle = oldGroups[i].endAngle;
+			if(oldStartAngles[d.elementIndex] != undefined && oldEndAngles[d.elementIndex] != undefined){//oldChords[ arcKey(d) ] != undefined &&  oldGroups[i] != undefined){
+				oldStartAngle = oldStartAngles[d.elementIndex][i%2];
+				oldEndAngle = oldEndAngles[d.elementIndex][i%2];
 				oldGirth = computeArcGirth(tOldSelfWeights[d.elementIndex], tOldMaxSelfWeight);
 			}else{
 				oldStartAngle = d.startAngle;
@@ -477,9 +487,6 @@ var ChordDiagram = (function(){
 			var interpolateGirth = d3.interpolate(oldGirth, newGirth);
 
 			return function(t) {
-//				d.endAngle = ;
-//				d.startAngle = ;
-//				d.outerRadius = interpolateGirth(t);
 				return arc.startAngle(interpolateStart(t)).endAngle(interpolateEnd(t)).outerRadius(interpolateGirth(t))();
 			}
 		}
@@ -496,7 +503,7 @@ var ChordDiagram = (function(){
 			startAngle = getAngleForElement(d, scale, level, true, newCompleteGroups);
 			endAngle = getAngleForElement(d, scale, level, false, newCompleteGroups);
 
-			if (tOldCompleteGroups[level][ d.elementIndex ]) {
+			if (tOldCompleteGroups[level][ d.elementIndex ] && tOldCompleteGroups[level - 1][d.id] != undefined) {
 
 				oldStartAngle = getAngleForElement(d, scale, level, true, tOldCompleteGroups);
 				oldEndAngle = getAngleForElement(d, scale, level, false, tOldCompleteGroups);
@@ -743,24 +750,36 @@ var ChordDiagram = (function(){
 			.data(updatedGroups, arcKey);
 
 			var newGroups = 
-				groups.enter().append("path")
+				groups.enter()//.append("g")
+				.append("path")
 				.attr("class", "arc")
 				.attr("id", function(d){ return dotExcaper("chord%"+d.elementIndex);})
 				.style("stroke", function(d) { return d3.color(colorOfElement(scales[currentScale], d.elementIndex)).darker(); })
 				.attr("opacity", "0")
-				.on('mouseover',
-						function (d) {
-					$('#pointerPanelDefault').hide();
-					$('#pointerPanel').html(
-							baseLevelInfo(d)
-					);
-					$('#pointerPanel').show();
-					higlightElements(dotExcaper(d.elementIndex));
+				.attr("d", d3.arc().innerRadius(radii[0][0]).outerRadius(function(d){
+					var currentSelfWeight = selfWeights[reverseLocalIndices[correctIndex(d.index)]];
+					return computeArcGirth(currentSelfWeight, maxSelfWeight);
 				})
-				.on('mouseleave', function(d){
-					hidePointerInfo();
-					higlightElements();
-				});//baseLevelTip.hide)								
+				)
+				.style("background-repeat", "repeat")
+				.attr("fill", function(d){
+					if(d.index%2 == 0)
+						return "url(#crosshatch-" + d.elementIndex + ")";
+					else
+						return colorOfElement(scales[currentScale], d.elementIndex)})				
+						.on('mouseover',
+								function (d) {
+							$('#pointerPanelDefault').hide();
+							$('#pointerPanel').html(
+									baseLevelInfo(d)
+							);
+							$('#pointerPanel').show();
+							higlightElements(dotExcaper(d.elementIndex));
+						})
+						.on('mouseleave', function(d){
+							hidePointerInfo();
+							higlightElements();
+						});//baseLevelTip.hide)		
 
 			//update chords
 			var chords = svg.select(".ribbons")
@@ -769,7 +788,7 @@ var ChordDiagram = (function(){
 
 			var newChords = 
 				chords.enter()
-				.append("path")
+				.insert("path")
 				.attr("id", function(d){
 					var root  = "ribbon%";
 					return root += reverseLocalIndices[correctIndex(d.source.index)];				
@@ -817,7 +836,17 @@ var ChordDiagram = (function(){
 
 				var currentAddedArcs = 
 					out.enter()
-					.append("g")
+					.append("path")
+					.attr("id", function(d){return dotExcaper("chord%"+d.elementIndex);})
+					.attr("d", function(d){
+						var startAngle = getAngleForElement(d, scale, level, true, newCompleteGroups);
+						var endAngle = getAngleForElement(d, scale, level, false, newCompleteGroups);
+						storeOuterRingArc(d, scale, level, startAngle, endAngle);
+						return arcs[level].startAngle(startAngle).endAngle(endAngle)();
+					})
+					.style("stroke", function(d) { return d3.rgb(colorOfElement(scales[scale], d.elementIndex)).darker(); })
+					.attr("fill", function(d){ return colorOfElement(scales[scale], d.elementIndex); })
+					.attr("opacity", 0)			
 					.on('mousemove',/*tip.show*/
 							function (d) {
 						$('#pointerPanelDefault').hide();
@@ -829,18 +858,6 @@ var ChordDiagram = (function(){
 					})
 					.on('mouseleave', function(d){hidePointerInfo(); higlightElements();}); 
 
-				currentAddedArcs
-				.append("path")
-				.attr("id", function(d){return dotExcaper("chord%"+d.elementIndex);})
-				.attr("d", function(d){
-					var startAngle = getAngleForElement(d, scale, level, true, newCompleteGroups);
-					var endAngle = getAngleForElement(d, scale, level, false, newCompleteGroups);
-					storeOuterRingArc(d, scale, level, startAngle, endAngle);
-					return arcs[level].startAngle(startAngle).endAngle(endAngle)();
-				})
-				.style("stroke", function(d) { return d3.rgb(colorOfElement(scales[scale], d.elementIndex)).darker(); })
-				.attr("fill", function(d){ return colorOfElement(scales[scale], d.elementIndex); })
-				.attr("opacity", 0);
 
 				newOuterArcs[level] = currentAddedArcs;
 				outerArcs[level] = out;
@@ -868,6 +885,11 @@ var ChordDiagram = (function(){
 			.duration(transitionTime)
 			.attr("opacity", 0)
 			.remove();
+
+			groups
+			.transition()
+			.duration(transitionTime)
+			.attrTween("d", arcTween(lastChord.groups, tOldSelfWeights, tOldMaxSelfWeight, selfWeights, maxSelfWeight));			
 
 			groups.exit()
 			.attr("opacity", 1)
@@ -1038,8 +1060,8 @@ var ChordDiagram = (function(){
 			var updatedGroups;
 			tempAngleFill = [];
 
-			var group = svg.select("g.groups")
-			.selectAll("g")
+			var group = svg.select("g.groups")//			.selectAll("g")
+			.selectAll("path")
 			.data(function(chords) {
 				if(chords == undefined)
 					updatedGroups = [];
@@ -1047,22 +1069,7 @@ var ChordDiagram = (function(){
 					updatedGroups = chordsLayout(chords, sameExtent); 
 				return updatedGroups;
 			}, arcKey)
-			.enter().append("g")
-			.on('mouseover',
-					function (d) {
-				$('#pointerPanelDefault').hide();
-				$('#pointerPanel').html(
-						baseLevelInfo(d)
-				);
-				$('#pointerPanel').show();
-				higlightElements(dotExcaper(d.elementIndex));
-			})
-			.on('mouseleave', function(d){
-				hidePointerInfo();
-				higlightElements();
-			});//baseLevelTip.hide);
-
-			group.append("path")
+			.enter().append("path")
 			.attr("class", "arc")
 			.attr("id", function(d){ return dotExcaper("chord%"+d.elementIndex);})
 			.style("stroke", function(d) { return d3.color(colorOfElement(scales[currentScale], d.elementIndex)).darker(); })
@@ -1076,7 +1083,36 @@ var ChordDiagram = (function(){
 				if(d.index%2 == 0)
 					return "url(#crosshatch-" + d.elementIndex + ")";
 				else
-					return colorOfElement(scales[currentScale], d.elementIndex)});
+					return colorOfElement(scales[currentScale], d.elementIndex)})//;			
+					.on('mouseover',
+							function (d) {
+						$('#pointerPanelDefault').hide();
+						$('#pointerPanel').html(
+								baseLevelInfo(d)
+						);
+						$('#pointerPanel').show();
+						higlightElements(dotExcaper(d.elementIndex));
+					})
+					.on('mouseleave', function(d){
+						hidePointerInfo();
+						higlightElements();
+					});//baseLevelTip.hide);
+
+			/*group.append("path")
+			.attr("class", "arc")
+			.attr("id", function(d){ return dotExcaper("chord%"+d.elementIndex);})
+			.style("stroke", function(d) { return d3.color(colorOfElement(scales[currentScale], d.elementIndex)).darker(); })
+			.attr("d", d3.arc().innerRadius(radii[0][0]).outerRadius(function(d){
+				var currentSelfWeight = selfWeights[reverseLocalIndices[correctIndex(d.index)]];
+				return computeArcGirth(currentSelfWeight, maxSelfWeight);
+			})
+			)
+			.style("background-repeat", "repeat")
+			.attr("fill", function(d){
+				if(d.index%2 == 0)
+					return "url(#crosshatch-" + d.elementIndex + ")";
+				else
+					return colorOfElement(scales[currentScale], d.elementIndex)});*/
 
 			svg.select("g.ribbons")
 			.selectAll("path")
@@ -1168,22 +1204,11 @@ var ChordDiagram = (function(){
 			.datum(elements, function(data) {return data.elementIndex;} );
 
 			var addedArcs = h
-			.selectAll("g")
+			.selectAll("path")
 			.data(function (arcs){ 
-				return arcs; })
-				.enter().append("g")
-				.on('mousemove',/*tip.show*/
-						function (d) {
-					$('#pointerPanelDefault').hide();
-					$('#pointerPanel').html(
-							outerRingInfo(d)	
-					);
-					$('#pointerPanel').show();
-					higlightElements(dotExcaper(d.elementIndex));					
-				})
-				.on('mouseleave', function(d){hidePointerInfo(); higlightElements();}); 
+				return arcs; });
 
-			addedArcs.append("path")
+			addedArcs.enter().append("path")
 			.attr("id", function(d){return dotExcaper("chord%"+d.elementIndex);})
 			.attr("d", function(d){
 				var startAngle = getAngleForElement(d, scale, level, true, newCompleteGroups);
@@ -1193,7 +1218,17 @@ var ChordDiagram = (function(){
 //				return outerRingArc(d, scale, level, startAngle, endAngle);				
 			})
 			.style("stroke", function(d) { return d3.rgb(colorOfElement(scales[scale], d.elementIndex)).darker(); })
-			.attr("fill", function(d){ return colorOfElement(scales[scale], d.elementIndex); })
+			.attr("fill", function(d){ return colorOfElement(scales[scale], d.elementIndex); })			
+			.on('mousemove',/*tip.show*/
+					function (d) {
+				$('#pointerPanelDefault').hide();
+				$('#pointerPanel').html(
+						outerRingInfo(d)	
+				);
+				$('#pointerPanel').show();
+				higlightElements(dotExcaper(d.elementIndex));					
+			})
+			.on('mouseleave', function(d){hidePointerInfo(); higlightElements();}); 
 
 			completeGroups[level] = newCompleteGroups[level];
 
