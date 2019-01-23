@@ -78,8 +78,8 @@ var Heatmap = (function(){
 
 		initHeatMapArea: function(){
 
-			hWidth = d3.select("#clusterArea").node().getBoundingClientRect().width + diagramPadding;
-			hHeight = d3.select("#clusterArea").node().getBoundingClientRect().height + diagramPadding;
+			hWidth = d3.select(container).node().getBoundingClientRect().width + diagramPadding;
+			hHeight = d3.select(container).node().getBoundingClientRect().height + diagramPadding;
 
 			d3.select(container).append('svg');
 
@@ -102,8 +102,8 @@ var Heatmap = (function(){
 			/*if(dataS != false)
 				data = dataS;*/
 
-			if(data.length == 0 || data == undefined){
-				//this.displayNoData();
+			if(data == undefined || data.length == 0){
+				this.displayNoData();
 			}else{
 
 				var svg = d3.select(container + " svg");
@@ -190,11 +190,11 @@ var Heatmap = (function(){
 			var svg = d3.select(container + " svg");
 
 			svg.append("g")
-			.attr("id", "no-data-text")
+			.attr("id", "no-heatmap-data-text")
 			.attr("transform","translate(" + (hWidth/2 - 40) + ", " + hHeight/2 + ")")
 			.append("text")
 			.attr("anchor-point", "middle")
-			.text("No data to display")
+			.text("No data to display on this superstep")
 			.attr("opacity", 1);			
 		},
 
