@@ -82,7 +82,7 @@
 						<div class="thumbnail">
 							<div class="caption">
 								<h3>
-									Shortest Path<br />on Amazon0302 Graph
+									Shortest Path<br />on Amazon0302
 								</h3>
 								<p>
 									<a class="btn btn-primary"
@@ -96,7 +96,7 @@
 						<div class="thumbnail">
 							<div class="caption">
 								<h3>
-									Page Rank<br />on add32 Graph
+									Page Rank<br />on add32
 								</h3>
 								<p>
 									<a class="btn btn-primary"
@@ -106,25 +106,25 @@
 						</div>
 					</div>
 
-					<!--<div class="col-md-3 col-sm-6 hero-feature">
+					<div class="col-md-3 col-sm-6 hero-feature">
 						<div class="thumbnail">
 							<div class="caption">
 								<h3>
-									Gila<br />on CTI Graph
+									Page Rank<br />on Europe_osm
 								</h3>
 								<p>
 									<a class="btn btn-primary"
-										href="job.php?id=job_1496827887976_0017">Go!</a>
+										href="job.php?id=job_1515947605864_0002">Go!</a>
 								</p>
 							</div>
 						</div>
 					</div>
 
-					<div class="col-md-3 col-sm-6 hero-feature">
+				<div class="col-md-3 col-sm-6 hero-feature">
 						<div class="thumbnail">
 							<div class="caption">
 								<h3>
-									Multi-Gila<br />on CTI Graph
+									Multi-Gila<br />on CTI
 								</h3>
 								<p>
 									<a class="btn btn-primary"
@@ -132,7 +132,7 @@
 								</p>
 							</div>
 						</div>
-					</div>-->
+					</div>
 				</div>
 				<!-- /.row -->
 
@@ -141,7 +141,7 @@
 						<div class="thumbnail">
 							<div class="caption">
 								<h3>
-									Shortest Path<br />on Asic_320 Graph
+									Shortest Path<br />on Asic_320 
 								</h3>
 								<p>
 									<a class="btn btn-primary"
@@ -155,27 +155,27 @@
 						<div class="thumbnail">
 							<div class="caption">
 								<h3>
-									Page Rank<br />on 4elt Graph
+									Shortest Path<br />on Europe-osm 
 								</h3>
 								<p></p>
 								<p>
 									<a class="btn btn-primary"
-										href="job.php?id=job_1515580225554_0028">Go!</a>
+										href="job.php?id=job_1515947605864_0004">Go!</a>
 								</p>
 							</div>
 						</div>
 					</div>
 
-					<!--<div class="col-md-3 col-sm-6 hero-feature">
+					<div class="col-md-3 col-sm-6 hero-feature">
 						<div class="thumbnail">
 							<div class="caption">
 								<h3>
-									Gila<br />on Gnutella31 Graph
+									Gila<br />on CTI
 								</h3>
 								<p></p>
 								<p>
 									<a class="btn btn-primary"
-										href="job.php?id=job_1496588883820_0020">Go!</a>
+										href="job.php?id=job_1496588883820_0017">Go!</a>
 								</p>
 							</div>
 						</div>
@@ -193,7 +193,7 @@
 								</p>
 							</div>
 						</div>
-					</div>-->
+					</div>
 				</div>
 
 				<hr>
@@ -229,11 +229,11 @@
 						<div class="thumbnail">
 							<div class="caption">
 								<h4>
-									4elt Graph
+									Europe-OSM Graph
 								</h4>
 							</div>
 							<div style="height: 600px; background-color: black">
-								<img src="../dist/media/4elt.png" />
+								<img src="../dist/media/europe_osm.gif" />
 							</div>
 						</div>
 					</div>
@@ -249,9 +249,36 @@
 							</div>
 						</div>
 					</div>
-				</div>				
-			</div>
 
+			</div>
+				<div class="row">
+					<div class="col-md-6 col-sm-6 hero-feature">
+						<div class="thumbnail">
+							<div class="caption">
+								<h4>
+									CTI Graph
+								</h4>
+							</div>
+							<div style="height: 600px; background-color: black">
+								<img src="../dist/media/cti.gif" />
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6 col-sm-6 hero-feature">
+						<div class="thumbnail">
+							<div class="caption">
+								<h4>
+									Gnutella31 Graph
+								</h4>
+							</div>
+							<div style="height: 600px; background-color: black">
+								<img src="../dist/media/gnutella31.gif" style="margin-top: 10%"/>
+							</div>
+						</div>
+					</div>
+				</div>				
+			</div>					
+				</div>							
 
 			<hr>
 
