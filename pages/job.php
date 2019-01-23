@@ -86,7 +86,7 @@
 					data-target=".navbar-collapse">
 					<span class="sr-only">Toggle navigation</span>
 				</button>
-				<a class="navbar-brand" href="index.html">GiViP: Giraph Profiler</a>
+				<a class="navbar-brand" href="index.php">GiViP: Giraph Profiler</a>
 				<a href="#" data-toggle="offcanvas"><i
 					class="navbar-brand fa fa-chevron-left"></i></a>
 			</div>
