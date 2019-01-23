@@ -43,7 +43,7 @@
 
     <?php
 				header ( 'Access-Control-Allow-Origin: *' );
-				require ("../functions.php");
+				require ("../WebContent/functions.php");
 				$jobid = $_GET ["id"];
 				
 				?>
@@ -110,8 +110,8 @@
 								$query_result = getJobsList ();
 								foreach ( $query_result as $job ) {
 									echo '<li>
-												<a href="job.php?id=' . $job ["id"] . '">' . $job ["id"] . '</a>
-											  </li>';
+											<a href="job.php?id=' . $job ["id"] . '">' . $job ["id"] . '</a>
+										 </li>';
 								}
 								?>
                             </ul> <!-- /.nav-second-level --></li>
@@ -277,14 +277,24 @@
 					<div class="col-md-6 no-left-padding no-right-padding fullHeight">
 						<div class="panel panel-default fullHeight">
 							<div class="panel-heading panel-subheading">
-								<i class="fa fa-sitemap fa-fw"></i> Cluster View
+								<i class="fa fa-sitemap fa-fw"></i><span id="clViewTitle"> Cluster View</span><span id="hmViewTitle"> Latency View</span>
+								<div class="pull-right">
+									<span class="smaller">Cluster</span> <input
+										id="latencySwitch" class="slider"
+										data-slider-id='latencyScope' type="text" data-slider-value="0"
+										data-slider-tooltip="hide" data-slider-handle="square" /> <span
+										class="smaller">Latencies</span>
+								</div>
 							</div>
+							<div id="clusterArea" class="panel-body fullHeight" style="padding-top: 0px;">
+							
+							<!-- /.panel-heading -->
 							<!-- 								<div class="panel-heading panel-subheading"> -->
 							<!-- 									<i class="fa fa-sitemap fa-fw"></i> Cluster Hierarchy -->
 							<!-- 								</div> -->
 							<!-- /.panel-heading -->
-							<div class="panel-body fullHeight">
 								<div id="treeMapArea" class="diagram"></div>
+								<div id="heatMapArea" class="diagram"></div>
 							</div>
 							<!-- /.panel-body -->
 						</div>
@@ -387,6 +397,7 @@
 	<script src="https://d3js.org/d3-shape.v1.min.js"></script>
 	<script src="https://d3js.org/d3-path.v1.min.js"></script>
 	<script src="https://d3js.org/d3-ease.v1.min.js"></script>
+	<script src="https://d3js.org/d3-scale.v1.min.js"></script>
 
 	<!-- Diagram JS files -->
 	<script type="text/javascript" src="../js/tip.js"></script>
@@ -397,11 +408,18 @@
 	<script type="text/javascript"
 		src="../js/diagrams/zoomableHistogramDiagram.js"></script>
 	<script type="text/javascript" src="../js/diagrams/pie.js"></script>
+	<script type="text/javascript" src="../js/diagrams/heatmap.js"></script>
 
 	<!-- Tolls JS files -->
 	<script type="text/javascript" src="../js/dataFetcher.js"></script>
 	<script type="text/javascript" src="../js/functions.js"></script>
 	<script type="text/javascript">		
+
+		$(document).ready(function(){
+			$('#heatMapArea').hide();
+			$('#hmViewTitle').hide();			
+		})
+		
 		$('.slide-button').click(function(event){
 			var iObj = $(event.currentTarget).find("i");
 			var p = $($('.panel-heading').has(event.currentTarget)[0]).next()[0];			
@@ -424,6 +442,7 @@
 		$('.globalScaleChanger').click(function(event){
 			setCurrentScale(event.currentTarget.id.split("-")[1]);
 		});
+
 	
 		leftMargin = $('#page-wrapper').css('margin-left');
 

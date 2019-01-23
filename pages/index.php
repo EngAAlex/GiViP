@@ -82,11 +82,11 @@
 						<div class="thumbnail">
 							<div class="caption">
 								<h3>
-									Shortest Path<br />on CTI Graph
+									Shortest Path<br />on Amazon0302 Graph
 								</h3>
 								<p>
 									<a class="btn btn-primary"
-										href="job.php?id=job_1496827887976_0005">Go!</a>
+										href="job.php?id=job_1515580225554_0080">Go!</a>
 								</p>
 							</div>
 						</div>
@@ -96,17 +96,17 @@
 						<div class="thumbnail">
 							<div class="caption">
 								<h3>
-									Page Rank<br />on CTI Graph
+									Page Rank<br />on add32 Graph
 								</h3>
 								<p>
 									<a class="btn btn-primary"
-										href="job.php?id=job_1496827887976_0008">Go!</a>
+										href="job.php?id=job_1515578835372_0003">Go!</a>
 								</p>
 							</div>
 						</div>
 					</div>
 
-					<div class="col-md-3 col-sm-6 hero-feature">
+					<!--<div class="col-md-3 col-sm-6 hero-feature">
 						<div class="thumbnail">
 							<div class="caption">
 								<h3>
@@ -132,7 +132,7 @@
 								</p>
 							</div>
 						</div>
-					</div>
+					</div>-->
 				</div>
 				<!-- /.row -->
 
@@ -141,11 +141,11 @@
 						<div class="thumbnail">
 							<div class="caption">
 								<h3>
-									Shortest Path<br />on Gnutella31 Graph
+									Shortest Path<br />on Asic_320 Graph
 								</h3>
 								<p>
 									<a class="btn btn-primary"
-										href="job.php?id=job_1496827887976_0006">Go!</a>
+										href="job.php?id=job_1515580225554_0072">Go!</a>
 								</p>
 							</div>
 						</div>
@@ -155,18 +155,18 @@
 						<div class="thumbnail">
 							<div class="caption">
 								<h3>
-									Page Rank<br />on Gnutella31 Graph
+									Page Rank<br />on 4elt Graph
 								</h3>
 								<p></p>
 								<p>
 									<a class="btn btn-primary"
-										href="job.php?id=job_1496827887976_0007">Go!</a>
+										href="job.php?id=job_1515580225554_0028">Go!</a>
 								</p>
 							</div>
 						</div>
 					</div>
 
-					<div class="col-md-3 col-sm-6 hero-feature">
+					<!--<div class="col-md-3 col-sm-6 hero-feature">
 						<div class="thumbnail">
 							<div class="caption">
 								<h3>
@@ -193,7 +193,7 @@
 								</p>
 							</div>
 						</div>
-					</div>
+					</div>-->
 				</div>
 
 				<hr>
@@ -203,11 +203,11 @@
 						<div class="thumbnail">
 							<div class="caption">
 								<h4>
-									CTI Graph
+									Amazon0302 Graph
 								</h4>
 							</div>
-							<div style="height: 600px; background-color: black">
-								<img src="../dist/media/cti.gif" />
+							<div style="height: 600px; background-color: black; overflow-y:hidden;">
+								<img src="../dist/media/amazon0302.gif" />
 							</div>
 						</div>
 					</div>
@@ -215,15 +215,41 @@
 						<div class="thumbnail">
 							<div class="caption">
 								<h4>
-									Gnutella31 Graph
+									add32 Graph
 								</h4>
 							</div>
 							<div style="height: 600px; background-color: black">
-								<img src="../dist/media/gnutella31.gif" style="margin-top: 10%"/>
+								<img src="../dist/media/add32.gif" style="margin-top: 10%"/>
 							</div>
 						</div>
 					</div>
 				</div>
+				<div class="row">
+					<div class="col-md-6 col-sm-6 hero-feature">
+						<div class="thumbnail">
+							<div class="caption">
+								<h4>
+									4elt Graph
+								</h4>
+							</div>
+							<div style="height: 600px; background-color: black">
+								<img src="../dist/media/4elt.png" />
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6 col-sm-6 hero-feature">
+						<div class="thumbnail">
+							<div class="caption">
+								<h4>
+									Asic_320 Graph
+								</h4>
+							</div>
+							<div style="height: 600px; background-color: black">
+								<img src="../dist/media/asic320.gif" style="margin-top: 10%"/>
+							</div>
+						</div>
+					</div>
+				</div>				
 			</div>
 
 

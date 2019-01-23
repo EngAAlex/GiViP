@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 var webServerUrl = "http://localhost:8080/GivipServer/1.0.0/";
+=======
+var webServerUrl = "http://localhost:8080/9Meg0/GiraphJobServer/1.0.0/"; //ADJUST TO CONFORM TO PROPER SERVER CONFIGURATION 
+>>>>>>> refs/remotes/origin/Development
 var jobInfoEndpoint = "JobInfo";
 var superstepBlockEndpoint = "SuperstepBlock/";
 
@@ -66,6 +70,7 @@ var diagramPaddingY = 10;
 var diagramPaddingX = 45;
 
 var treemapDiagram = TreeMap();
+var heatmapDiagram = Heatmap();
 var chordDiagram = ChordDiagram();
 var pieDiagram = Pie();
 var stackedAreas = {};
@@ -155,7 +160,7 @@ function firstSetupCallback(data){
 //		computeTicks(index);
 	});
 
-	superstepBlocks = reduceCrossings(superstepBlocks);
+	//superstepBlocks = reduceCrossings(superstepBlocks);
 
 	currentStartPage = Math.floor(currentSuperstepIndex/(paginationExtent*currentBlockSize));
 
@@ -187,7 +192,7 @@ function firstSetupCallback(data){
 	else
 		$('#prevPage').attr('disabled', 'disabled');
 
-	$('#framesDisplay').html(currentSuperstepIndex + " to " + nextIndex);		
+	$('#framesDisplay').html(Math.floor(currentSuperstepIndex/currentBlockSize) + " to " + Math.ceil(nextIndex/currentBlockSize));		
 }
 
 function paginateSuperstepBlocks(){
@@ -246,6 +251,7 @@ function resizeDiagrams(){
 	clearAll();
 	updateAxis();
 	treemapDiagram.resize();
+	heatmapDiagram.resize();
 	chordDiagram.resize();
 	prepareAndDisplayAll();
 }
@@ -309,10 +315,12 @@ function appendXAxisToFrame(frame){
 
 	svg.append("g")
 	.attr("class", "x axis active")
-	.attr("transform", "translate(0," + (xAxisHeight - 5) + ")");
+	.attr("transform", "translate(0," + (xAxisHeight - 5) + ")")
+	.style("font-size", "14");
 
 	svg.select("g.x.axis").call(xAxis)
 	.selectAll(".tick text")
+	.attr("transform", "translate(0," + (3) + ")")
 	.call(wrapLabels);
 
 }
@@ -328,6 +336,7 @@ function fetchAllData(){
 function initDiagramAreas(){
 	chordDiagram.setUpChordDiagram();
 	treemapDiagram.initTreeMapArea();
+	heatmapDiagram.initHeatMapArea();
 }
 
 function nextSuperstep(){
@@ -357,7 +366,9 @@ function setCurrentSuperstep(c, needle = false){
 		prepareAndDisplayAll();
 	}else{
 //		clearChordDiagram();
-//		renderChordDiagram();		
+//		renderChordDiagram();
+		clearHeatmap();
+		heatmapDiagram.showHeat(superstepBlocks["host"][currentSuperstep].latencies);
 		chordDiagram.animate();		
 	}
 	moveNeedle(
@@ -385,6 +396,7 @@ function clearAll(){
 	clearSmallMultiple();
 	clearTreemap();
 	clearChordDiagram();
+	clearHeatmap();
 }
 
 function clearSmallMultiple(){
@@ -404,6 +416,10 @@ function clearTreemap(){
 
 function clearChordDiagram(){
 	chordDiagram.clear();
+}
+
+function clearHeatmap(){
+	heatmapDiagram.clear();
 }
 
 function prepareSmallMultipleArea(){
@@ -448,6 +464,7 @@ function prepareAndDisplayAll(animateOrReset = false){
 //	updateAxis();
 
 	treemapDiagram.plotTreemap();
+	heatmapDiagram.showHeat(superstepBlocks["host"][currentSuperstep].latencies);
 
 //	pieDiagram.pieAreaSetup();
 
@@ -661,6 +678,7 @@ function simplifyHierarchy(hierarchy){
 			});
 		});
 	});
+	heatmapDiagram.addHosts(simplifiedHierarchy["host"]);
 }
 
 //####### HIDDEN ELEMENTS LISTENER
@@ -774,6 +792,23 @@ function bindSlider(nsupersteps){
 		clearAll();
 		setCurrentScale(event.value);
 		$("#loading-modal").modal('hide');
+	});
+	
+	$('#latencySwitch').slider({
+			ticks: [0, 1]
+	}).on("slideStop", function(event){
+		var target = event.currentTarget.value;
+		if(target == 0){
+			$('#heatMapArea').hide();
+			$('#hmViewTitle').hide()
+			$('#treeMapArea').show();	
+			$('#clViewTitle').show()			
+		}else{
+			$('#heatMapArea').show();
+			$('#treeMapArea').hide();	
+			$('#clViewTitle').hide()			
+			$('#hmViewTitle').show()			
+		}
 	});
 
 	$('#ex1Slider .slider-tick-label-container').remove();

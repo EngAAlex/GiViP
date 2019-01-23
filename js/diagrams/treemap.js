@@ -9,6 +9,8 @@ var TreeMap = (function(){
 	
 	var xCorrection;
 	var yCorrection;
+	
+	var classes = ["large", "medium", "small", "smaller", "x-small"];
 
 	var treemap = d3.treemap()
 	.tile(d3.treemapResquarify)
@@ -20,32 +22,45 @@ var TreeMap = (function(){
 	var stratification = d3.stratify()
 	.id(function(d) { return d.id; })
 	.parentId(function(d) { return d.parent; });
+	
+	var treemapTip = d3.tip()
+	.attr('class', 'chart-tooltip treemapTip')
+	.offset(function(d){ 
+			var x = d.x1-d.x0;
+			var y = d.y1-d.y0;
+			return [y/2 + 10,0];})
+	.html(function(d){
+		return "<strong>Element:</strong> <span style='color:red'>" + d.id + "</span><br />" +
+				"<strong>Vertices:</strong> <span style='color:red'>" + d.value + "</span>";
+	});	
 
 	return {
 
 		resize: function(){
 
-			hWidth = d3.select("#treeMapArea").node().getBoundingClientRect().width;
-			hHeight = d3.select("#treeMapArea").node().getBoundingClientRect().height;
+			hWidth = d3.select("#clusterArea").node().getBoundingClientRect().width + diagramPadding;
+			hHeight = d3.select("#clusterArea").node().getBoundingClientRect().height + diagramPadding/2;
 
 			d3.select('#treeMapArea').select('svg')
-			.attr("width", hWidth).attr("height", hHeight + 25)
-			.attr("transform", "translate(-5," + diagramPadding +")");
+			.attr("width", hWidth).attr("height", hHeight)
+			.attr("transform", "translate(0," + (-diagramPadding/2) +")");
 			
-			treemap.size([hWidth, hHeight]);
+			treemap = treemap.size([hWidth, hHeight]);
+			
+			this.plotTreemap();
 
 		},
 
 		initTreeMapArea: function(){
 
-			hWidth = d3.select("#treeMapArea").node().getBoundingClientRect().width;
-			hHeight = d3.select("#treeMapArea").node().getBoundingClientRect().height;
+			hWidth = d3.select("#clusterArea").node().getBoundingClientRect().width + diagramPadding;
+			hHeight = d3.select("#clusterArea").node().getBoundingClientRect().height  + diagramPadding/2;
 
 			var svg = d3.select('#treeMapArea').append('svg')
-			.attr("width", hWidth).attr("height", hHeight + 25)
-			.attr("transform", "translate(-5," + diagramPadding +")");
+			.attr("width", hWidth).attr("height", hHeight)
+			.attr("transform", "translate(0," + (-diagramPadding/2) + ")");
 
-			treemap.size([hWidth, hHeight]);
+			treemap = treemap.size([hWidth, hHeight]);
 
 		},
 
@@ -54,7 +69,7 @@ var TreeMap = (function(){
 			var svg = d3.select('#treeMapArea svg');
 
 			xCorrection = 0;
-			yCorrection = 0;
+			yCorrection = -30;
 //			var virtualRoot = {};
 //			virtualRoot.children = superstepBlocks[scales[currentScale]][currentSuperstep].blockElementDetails;
 
@@ -74,9 +89,9 @@ var TreeMap = (function(){
 			var cell = svg.selectAll("g")
 			.data(hierarchy.descendants())
 			.enter().append("g")
-			.attr("transform", function(d) { return "translate(" + d.x0 + "," + d.y0 + ")"; })
-			.on("mouseover", function(d){higlightElements(d3.event.target.id.split("treemap-node-")[1]);})
-			.on("mouseout", function(d){higlightElements();})			
+			.attr("transform", function(d) { return "translate(" + (d.x0 + xCorrection) + "," + (d.y0 + yCorrection) + ")"; })
+			.on("mouseover", function(d){treemapTip.show(d); higlightElements(d3.event.target.id.split("treemap-node-")[1]);})
+			.on("mouseout", function(d){treemapTip.hide(); higlightElements();})			
 			.on("click", function(d){ 
 				checkElementRemoval(d.descendants());
 			});
@@ -143,12 +158,24 @@ var TreeMap = (function(){
 				else
 					return dimensions[2]/2;
 				})
-			.text(function(d) { return d.split("%")[0].split(".")[0]; });
+			.text(function(d) { return d.split("%")[0].split(".")[0]; })
+			.attr("class", function(d){
+				var classNeedle = 0;
+				var tWidth = this.getComputedTextLength();
+				var dimension = parseInt(d.split("%")[1]);
+				while(tWidth > dimension && classNeedle <= classes.length - 1){
+					classNeedle++;
+					this.style.fontSize = classes[classNeedle];
+					tWidth = this.getComputedTextLength();					
+				}
+				return "text-"+classes[classNeedle];	
+			});
 
-			cell.append("title")
-			.text(function(d) { return d.id + "\nVertices: " + d.value; });
+			/*cell.append("title")
+			.text(function(d) { return d.id + "\nVertices: " + d.value; });*/
 
 			svg.select("#virtualRoot").remove();
+			svg.call(treemapTip);
 			
 //			.attr("font-size", function(d) { 
 //				var splits = d.split("%");

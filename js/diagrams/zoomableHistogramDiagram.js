@@ -7,7 +7,14 @@ var AreaChart = (function(){
 	.attr('class', 'chart-tooltip histogramTip')
 	.offset([0,0])
 	.html(function(d){
-		return "<strong>Frame:</strong> <span style='color:red'>" + d.numberOfBlock + "</span><br /><strong>Duration:</strong> <span style='color:red'>" + d.duration + "</span>";
+		var uls = "Computations: <ul>";
+		$.each(d.computations, function(index, item){
+			uls += "<li>"+item.classname+"&emsp;<span style='float: right;'>x"+item.occurrencies+"</span></li>"
+		})
+		uls += "</ul>";
+		return "<strong>Frame:</strong> <span style='color:red'>" + d.numberOfBlock + "</span><br />" +
+				"<strong>Duration:</strong> <span style='color:red'>" + d.duration + "</span><br />" +
+				uls;
 	});
 
 //	function zoom() {
@@ -104,7 +111,7 @@ var AreaChart = (function(){
 				return colorOfElement(scales[currentScale], elementIndex);
 			})
 			.attr("d", area)
-			.on('mousemove',/*tip.show*/
+			.on('mouseover',/*tip.show*/
 					function (d) {
 				histogramTip.hide();
 				var target = d3.select('#histogramTipfollowscursor-'+frame)
@@ -124,7 +131,8 @@ var AreaChart = (function(){
 
 			svg.append("g")
 			.attr("class", "y axis")
-			.attr("transform", "translate(" + (diagramPaddingX) + ",0)");
+			.attr("transform", "translate(" + (diagramPaddingX) + ",0)")
+			.style("font-size", "14");					
 
 			svg.append("path")
 			.datum(superstepBlocks[scales[currentScale]])
@@ -143,10 +151,10 @@ var AreaChart = (function(){
 			//.call(d3.zoom().on("zoom", zoom));
 			
 			// Vertical grid
-			svg.append("g")       
-			.attr("class", "vertical-axis")
+			svg.append("g")    
+			.datum(superstepBlocks[scales[currentScale]])
+			.attr("class", function(d){return d[currentSuperstep].latencies != undefined || d[currentSuperstep].latencies > 0 ? "vertical-axis latency" : "vertical-axis";})
 			.attr("transform", "translate(0," + (hHeight)  + ")")
-			.attr("stroke", "lightgray")
 			.attr("stroke-dasharray", "5,5")
 			.attr("stroke-opacity", "0.4")			
 			.call(d3.axisBottom().scale(x)
@@ -155,6 +163,10 @@ var AreaChart = (function(){
 					.tickValues(xAxis.tickValues())
 			);
 
+			//.attr("stroke", function(d){ return
+			//	d[currentSuperstep].latencies != undefined || d[currentSuperstep].latencies > 0 ? "purple" : "lightgray";})
+
+			
 			svg.append("line")
 			.attr("class", "needle")
 			.attr("x1", x(x.domain()[0])) 
